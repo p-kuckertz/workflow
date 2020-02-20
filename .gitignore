@@ -1,0 +1,4 @@
+# Directories
+.snakemake/
+biogeo.ucdavis.edu/
+output_data/
