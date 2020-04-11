@@ -7,7 +7,7 @@ PARAMS = pd.read_csv('input_data/landEligibilityParameters.csv', index_col='name
 gl.Priors.loadDirectory("input_data")
 
 # INPUTS
-regionFile = "data/gadm36_DEU_1.shp"
+regionFile = "output_data/gadm36_DEU_1.shp"
 regionID = int(PARAMS.loc['regionID'])
 settlement_proximity = int(PARAMS.loc['exc_settlement_proximity'])
 
