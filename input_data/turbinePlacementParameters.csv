@@ -1,8 +1,3 @@
 name,value
-regionFile,/data/s-ryberg/data/regions/gadm/DEU_adm1.shp
 regionID,6
-priorDatasetDirectory,/home/s-ryberg/repos/glaes/glaes/data/priors
-exc_settlement_proximity,1000
 turbineSeparation,1200
-gwaFile,data/gwa_de_100m.tif
-turbineDesign,E-126_EP4

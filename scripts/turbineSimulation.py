@@ -1,19 +1,22 @@
 # coding: utf-8
 
+# TODO: Substitute input file paths.
+#       Get wind data from somewhere.
+#       Do not synthesize (and hardcode) anything.
+
 # Import modules
 import geokit as gk
 from reskit import windpower
 import pandas as pd
 import numpy as np
-PARAMS = pd.read_csv( "input_data/turbineSimulationParameters.csv", index_col='name')['value']
 
-# INPUT FILES
+# Load input files
+parameterFile = pd.read_csv(snakemake.input[0], index_col='name')['value']
 gwaFile = "/data/s-ryberg/data/geography/global_wind_atlas/v3/gwa3_250_wind-speed_100m.tif"
 placementFile = "output_data/placements.shp"
-turbineDesign = windpower.TurbineLibrary.loc[PARAMS['turbineDesign']]
 
-# OUTPUTS
-outputFile = "output_data/generation.csv"
+# Set parameters according to parameter file
+turbineDesign = windpower.TurbineLibrary.loc[parameterFile['turbineDesign']]
 
 # Get Placements
 placements = gk.vector.extractFeatures(placementFile)
@@ -28,4 +31,6 @@ windspeedValues = pd.DataFrame(np.random.normal(placements['ws100m'], placements
 
 # Wind turbine simulation
 generation = windpower.simulateTurbine(windspeedValues, powerCurve=turbineDesign.PowerCurve)
-generation.to_csv(outputFile)
+
+# Save result
+generation.to_csv(snakemake.output[0])

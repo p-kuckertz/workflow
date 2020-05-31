@@ -1,29 +1,39 @@
 # coding: utf-8
 
+# TODO: The params file should only use the parameters of the glaes interface.
+#       So we can reference the glaes interface documentation to explain parameter meaning and usage.
+#       "proximity_start" is temporarily added to avoid hardcoding 0s.
+
 # Import modules
 import glaes as gl
 import pandas as pd
-PARAMS = pd.read_csv('input_data/landEligibilityParameters.csv', index_col='name')['value']
-gl.Priors.loadDirectory("input_data")
 
-# INPUTS
-regionFile = "output_data/gadm36_DEU_1.shp"
-regionID = int(PARAMS.loc['regionID'])
-settlement_proximity = int(PARAMS.loc['exc_settlement_proximity'])
+# Load input files
+parameterFile = pd.read_csv(snakemake.input[0], index_col='name')['value']
+regionFile = snakemake.input[1]
+# Load directory of prior dataset
+gl.Priors.loadDirectory("input_data/priorDataSet")
 
-# OUTPUTS
-outputFile = "output_data/eligibility_result.tif"
+# Set parameters according to parameter file
+regionID = int(parameterFile.loc['regionID'])
+proximity_start = int(parameterFile.loc['proximity_start'])
+settlement_proximity = int(parameterFile.loc['settlement_proximity'])
+roads_main_proximity = int(parameterFile.loc['roads_main_proximity'])
+roads_secondary_proximity = int(parameterFile.loc['roads_secondary_proximity'])
+protected_landscape_proximity = int(parameterFile.loc['protected_landscape_proximity'])
 
-# Initiate Exclusion Calculator object
+# Initiate exclusion calculator object
 ec = gl.ExclusionCalculator(regionFile, where=regionID)
 
-# Do a simple exclusion
-ec.excludePrior("settlement_proximity", value=(0,settlement_proximity)) # Exclude urban areas
-
-# TODO: Add into inputs
-ec.excludePrior("roads_main_proximity", value=(0,200)) # Exclude urban areas
-ec.excludePrior("roads_secondary_proximity", value=(0,200)) # Exclude urban areas
-ec.excludePrior("protected_landscape_proximity", value=(0,1000)) # Exclude urban areas
+# Exclude areas
+# Exclude urban areas
+ec.excludePrior("settlement_proximity", value=(proximity_start,settlement_proximity))
+# Exclude urban areas
+ec.excludePrior("roads_main_proximity", value=(proximity_start,roads_main_proximity))
+# Exclude urban areas
+ec.excludePrior("roads_secondary_proximity", value=(proximity_start,roads_secondary_proximity))
+# Exclude urban areas
+ec.excludePrior("protected_landscape_proximity", value=(proximity_start,protected_landscape_proximity))
 
 # Save result
-ec.save(outputFile)
+ec.save(snakemake.output[0])

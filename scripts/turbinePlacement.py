@@ -1,24 +1,26 @@
 # coding: utf-8
 
+# TODO: Why is the substitution of the reagion and eligibility file paths not working?
+#       Why is there no ".loc" at turbineSeparation?
+
 # Import modules
 import glaes as gl
 import pandas as pd
-PARAMS = pd.read_csv( "input_data/turbinePlacementParameters.csv", index_col='name')['value']
 
-# INPUT FILES
+# Load input files
+parameterFile = pd.read_csv(snakemake.input[0], index_col='name')['value']
 regionFile = "output_data/gadm36_DEU_1.shp"
-regionID = int(PARAMS.loc['regionID'])
 eligibilityFile = "output_data/eligibility_result.tif"
-turbineSeparation = float(PARAMS['turbineSeparation'])
 
-# OUTPUTS
-outputFile = "output_data/placements.shp"
+# Set parameters according to parameter file
+regionID = int(parameterFile.loc['regionID'])
+turbineSeparation = float(parameterFile['turbineSeparation'])
 
-# Initiate Exclusion Calculator object
+# Initiate exclusion calculator object
 ec = gl.ExclusionCalculator(regionFile, where=regionID)
 
-# load eligibility result from RULE 1
+# Load land eligibility result
 ec.excludeRasterType(eligibilityFile, value=0)
 
-# Do Placement algorithm
-items = ec.distributeItems(turbineSeparation, output=outputFile)
+# Execute placement algorithm and save output file
+items = ec.distributeItems(turbineSeparation, output=snakemake.output[0])
