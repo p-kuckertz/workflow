@@ -2,3 +2,4 @@
 .snakemake/
 biogeo.ucdavis.edu/
 output_data/
+input_data/priorDataSet
