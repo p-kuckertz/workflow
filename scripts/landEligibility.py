@@ -3,6 +3,7 @@
 # TODO: The params file should only use the parameters of the glaes interface.
 #       So we can reference the glaes interface documentation to explain parameter meaning and usage.
 #       "proximity_start" is temporarily added to avoid hardcoding 0s.
+#		Remove path from "loadDirectory"
 
 # Import modules
 import glaes as gl

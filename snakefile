@@ -2,11 +2,11 @@ from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
 HTTP = HTTPRemoteProvider()
 
 rule all:
-    input: "output_data/energySystemOptimizationResults.xlsx"
+    input: "output_data/scenarioInput.xlsx"
 
-rule fetchResources:
+rule fetchRegionData:
     input:
-        region=HTTP.remote("biogeo.ucdavis.edu/data/gadm3.6/shp/gadm36_DEU_shp.zip", keep_local=True)
+        region=HTTP.remote("biogeo.ucdavis.edu/data/gadm3.6/shp/gadm36_DEU_shp.zip", keep_local=False)
     output:
         # Shapefile
         "output_data/gadm36_DEU_1.shp",
@@ -47,14 +47,14 @@ rule turbinePlacement:
     input:
         # Parameters
         "input_data/turbinePlacementParameters.csv",
+        # Land eligibility result
+        "output_data/eligibility_result.tif",
         # Shapefile
         "output_data/gadm36_DEU_1.shp",
         "output_data/gadm36_DEU_1.shx",
         "output_data/gadm36_DEU_1.prj",
         "output_data/gadm36_DEU_1.dbf",
         "output_data/gadm36_DEU_1.cpg",
-        # Land eligibility result
-        "output_data/eligibility_result.tif",
     output:
         # Turbine placement Result
         "output_data/placements.shp",
@@ -65,13 +65,21 @@ rule turbinePlacement:
         "envs/renewables-env.yml"
     script:
         "scripts/turbinePlacement.py"
-        
+
+rule fetchWeatherData:
+    input:
+        weatherData=HTTP.remote("https://globalwindatlas3.s3-eu-west-1.amazonaws.com/country_tifs/DEU_wind-speed_100m.tif", keep_local=False)
+    output:
+        "output_data/DEU_wind-speed_100m.tif",
+    shell:
+        ("cp {input.weatherData} output_data")
+
 rule turbineSimulation:
     input:
-	      # Parameters
+        # Parameters
         "input_data/turbineSimulationParameters.csv",
         # Data Files
-        "/data/s-ryberg/data/geography/global_wind_atlas/v3/gwa3_250_wind-speed_100m.tif",
+        "output_data/DEU_wind-speed_100m.tif",
         # Turbine placement Result
         "output_data/placements.shp",
         "output_data/placements.shx",
@@ -85,12 +93,20 @@ rule turbineSimulation:
     script:
         "scripts/turbineSimulation.py"
 
+rule fetchScenarioData:
+    input:
+        scenarioData=HTTP.remote("github.com/FZJ-IEK3-VSA/FINE/raw/v.1.0.2/examples/Model%20Run%20from%20Excel/scenarioInput.xlsx", keep_local=False)
+    output:
+        "output_data/scenarioInput.xlsx",
+    shell:
+        ("cp {input.scenarioData} output_data")
+
 rule mergeEnergySystemData:
     input:
         # Turbine simulation result
         "output_data/generation.csv",
         # Energy system scenario data
-        "input_data/scenarioInput.xlsx"
+        "output_data/scenarioInput.xlsx"
     output:
         "output_data/mergedEnergySystemScenarioData.xlsx"
     conda:

@@ -1,8 +1,7 @@
 # coding: utf-8
 
-# TODO: Substitute input file paths.
-#       Get wind data from somewhere.
-#       Do not synthesize (and hardcode) anything.
+# TODO: Do not synthesize (and hardcode) anything.
+#       Originally, the following much bigger file was used "/data/s-ryberg/data/geography/global_wind_atlas/v3/gwa3_250_wind-speed_100m.tif"
 
 # Import modules
 import geokit as gk
@@ -12,8 +11,8 @@ import numpy as np
 
 # Load input files
 parameterFile = pd.read_csv(snakemake.input[0], index_col='name')['value']
-gwaFile = "/data/s-ryberg/data/geography/global_wind_atlas/v3/gwa3_250_wind-speed_100m.tif"
-placementFile = "output_data/placements.shp"
+gwaFile = snakemake.input[1]
+placementFile = snakemake.input[2]
 
 # Set parameters according to parameter file
 turbineDesign = windpower.TurbineLibrary.loc[parameterFile['turbineDesign']]

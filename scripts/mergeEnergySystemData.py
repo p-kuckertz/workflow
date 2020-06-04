@@ -1,7 +1,6 @@
 # coding: utf-8
 
-# TODO: Get scenarioInput.xlsx from GitHub repository.
-#       Is there a more elegant way?
+# TODO: Is there a more elegant way?
 
 # Import modules
 import pandas as pd
