@@ -2,7 +2,7 @@ from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
 HTTP = HTTPRemoteProvider()
 
 rule all:
-    input: "output_data/scenarioInput.xlsx"
+    input: "output_data/energySystemOptimizationResults.xlsx"
 
 rule fetchRegionData:
     input:
@@ -95,6 +95,7 @@ rule turbineSimulation:
 
 rule fetchScenarioData:
     input:
+        # TODO: use FINE 2.x instead of 1.0.2 because of blanks in file path. Ask developers to tag a corresponding commit as v.2
         scenarioData=HTTP.remote("github.com/FZJ-IEK3-VSA/FINE/raw/v.1.0.2/examples/Model%20Run%20from%20Excel/scenarioInput.xlsx", keep_local=False)
     output:
         "output_data/scenarioInput.xlsx",
